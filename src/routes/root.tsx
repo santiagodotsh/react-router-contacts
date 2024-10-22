@@ -1,8 +1,11 @@
 import {
   Form,
   Link,
+  NavLink,
   Outlet,
-  useLoaderData
+  redirect,
+  useLoaderData,
+  useNavigation
 } from 'react-router-dom'
 import {
   createContact,
@@ -16,14 +19,16 @@ export async function loader(): Promise<{ contacts: Contact[] }> {
   return { contacts }
 }
 
-export async function action(): Promise<{ contact: Contact }> {
+export async function action(): Promise<Response> {
   const contact = await createContact()
   
-  return { contact }
+  return redirect(`/contacts/${contact.id}/edit`)
 }
 
 export function Root() {
   const { contacts } = useLoaderData() as { contacts: Contact[] }
+  
+  const navigation = useNavigation()
   
   return (
     <>
@@ -65,20 +70,31 @@ export function Root() {
                 <ul>
                   {contacts.map((contact) => (
                     <li key={contact.id}>
-                      <Link to={`contacts/${contact.id}`}>
-                        {contact.first || contact.last
-                          ? (
-                              <>
-                                {contact.first} {contact.last}
-                              </>
-                            )
-                          : (
-                              <i>No Name</i>
-                            )
-                        }{' '}
+                      <NavLink
+                        to={`contacts/${contact.id}`}
+                        className={({ isActive, isPending }) =>
+                          isActive
+                            ? 'active'
+                            : isPending
+                            ? 'pending'
+                            : ''
+                        }
+                      >
+                        <Link to={`contacts/${contact.id}`}>
+                          {contact.first || contact.last
+                            ? (
+                                <>
+                                  {contact.first} {contact.last}
+                                </>
+                              )
+                            : (
+                                <i>No Name</i>
+                              )
+                          }{' '}
 
-                        {contact.favorite && <span>★</span>}
-                      </Link>
+                          {contact.favorite && <span>★</span>}
+                        </Link>
+                      </NavLink>
                     </li>
                   ))}
                 </ul>
@@ -92,7 +108,7 @@ export function Root() {
         </nav>
       </div>
 
-      <div id='detail'>
+      <div id='detail' className={navigation.state === 'loading' ? 'loading' : ''}>
         <Outlet />
       </div>
     </>

@@ -60,7 +60,11 @@ export function Contact() {
             method='post'
             action='destroy'
             onSubmit={(event) => {
-              if (!confirm('Please confirm you want to delete this record.')) {
+              if (
+                !confirm(
+                  "Please confirm you want to delete this record."
+                )
+              ) {
                 event.preventDefault()
               }
             }}
