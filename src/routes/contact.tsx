@@ -1,14 +1,27 @@
 import {
   Form,
+  useFetcher,
   useLoaderData,
   type Params
 } from 'react-router-dom'
-import { getContact, type Contact } from '../contacts'
+import {
+  getContact,
+  updateContact,
+  type Contact
+} from '../contacts'
 
 export async function loader({ params }: { params: Params<string> }): Promise<{ contact: Contact | null }> {
   const contact = await getContact(params.contactId as string)
 
   return { contact }
+}
+
+export async function action({ request, params }: { request: Request, params: Params<string> }) {
+  const formData = await request.formData()
+
+  return updateContact(params.contactId!, {
+    favorite: formData.get('favorite') === 'true'
+  })
 }
 
 export function Contact() {
@@ -62,7 +75,7 @@ export function Contact() {
             onSubmit={(event) => {
               if (
                 !confirm(
-                  "Please confirm you want to delete this record."
+                  'Please confirm you want to delete this record.'
                 )
               ) {
                 event.preventDefault()
@@ -80,10 +93,12 @@ export function Contact() {
 }
 
 function Favorite({ contact }: { contact: Contact }) {
+  const fetcher = useFetcher()
+  
   const favorite = contact.favorite
 
   return (
-    <Form method='post'>
+    <fetcher.Form method='post'>
       <button
         name='favorite'
         value={favorite ? 'false' : 'true'}
@@ -95,6 +110,6 @@ function Favorite({ contact }: { contact: Contact }) {
       >
         {favorite ? '★' : '☆'}
       </button>
-    </Form>
+    </fetcher.Form>
   )
 }
