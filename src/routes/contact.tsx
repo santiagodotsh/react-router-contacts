@@ -13,6 +13,13 @@ import {
 export async function loader({ params }: { params: Params<string> }): Promise<{ contact: Contact | null }> {
   const contact = await getContact(params.contactId as string)
 
+  if (!contact) {
+    throw new Response('', {
+      status: 404,
+      statusText: 'Not Found'
+    })
+  }
+
   return { contact }
 }
 
