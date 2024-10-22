@@ -10,13 +10,13 @@ import {
   type Contact
 } from '../contacts'
 
-export async function loader() {
+export async function loader(): Promise<{ contacts: Contact[] }> {
   const contacts = await getContacts()
 
   return { contacts }
 }
 
-export async function action() {
+export async function action(): Promise<{ contact: Contact }> {
   const contact = await createContact()
   
   return { contact }
