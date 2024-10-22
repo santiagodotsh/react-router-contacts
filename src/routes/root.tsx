@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   Form,
   Link,
@@ -5,7 +6,8 @@ import {
   Outlet,
   redirect,
   useLoaderData,
-  useNavigation
+  useNavigation,
+  useSubmit
 } from 'react-router-dom'
 import {
   createContact,
@@ -13,10 +15,13 @@ import {
   type Contact
 } from '../contacts'
 
-export async function loader(): Promise<{ contacts: Contact[] }> {
-  const contacts = await getContacts()
+export async function loader({ request }: { request: Request }): Promise<{ contacts: Contact[], q: string | null }> {
+  const url = new URL(request.url)
+  const q = url.searchParams.get('q')
 
-  return { contacts }
+  const contacts = await getContacts(q ?? undefined)
+
+  return { contacts, q }
 }
 
 export async function action(): Promise<Response> {
@@ -26,9 +31,19 @@ export async function action(): Promise<Response> {
 }
 
 export function Root() {
-  const { contacts } = useLoaderData() as { contacts: Contact[] }
-  
+  const { contacts, q } = useLoaderData() as { contacts: Contact[], q: string | null }
   const navigation = useNavigation()
+  const submit = useSubmit()
+
+  const searching = navigation.location && new URLSearchParams(navigation.location.search).has('q')
+
+  useEffect(() => {
+    const input = document.getElementById('q')
+
+    if (input instanceof HTMLInputElement) {
+      input.value = q!
+    }
+  }, [q])
   
   return (
     <>
@@ -43,12 +58,15 @@ export function Root() {
               placeholder='Search'
               type='search'
               name='q'
+              defaultValue={q!}
+              className={searching ? 'loading' : ''}
+              onChange={(event) => submit(event.currentTarget.form)}
             />
 
             <div
               id='search-spinner'
               aria-hidden
-              hidden={true}
+              hidden={!searching}
             />
 
             <div
