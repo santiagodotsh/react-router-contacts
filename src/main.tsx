@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { Index } from './routes'
 import {
   Root,
   loader as rootLoader,
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
     loader: rootLoader,
     action: rootAction,
     children: [
+      {
+        index: true,
+        element: <Index />
+      },
       {
         path: 'contacts/:contactId',
         element: <Contact />,
