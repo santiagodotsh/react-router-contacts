@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import {
   Form,
-  Link,
   NavLink,
   Outlet,
   redirect,
@@ -102,20 +101,18 @@ export function Root() {
                             : ''
                         }
                       >
-                        <Link to={`contacts/${contact.id}`}>
-                          {contact.first || contact.last
-                            ? (
-                                <>
-                                  {contact.first} {contact.last}
-                                </>
-                              )
-                            : (
-                                <i>No Name</i>
-                              )
-                          }{' '}
+                        {contact.first || contact.last
+                          ? (
+                              <>
+                                {contact.first} {contact.last}
+                              </>
+                            )
+                          : (
+                              <i>No Name</i>
+                            )
+                        }{' '}
 
-                          {contact.favorite && <span>★</span>}
-                        </Link>
+                        {contact.favorite && <span>★</span>}
                       </NavLink>
                     </li>
                   ))}
